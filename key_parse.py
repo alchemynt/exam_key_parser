@@ -26,7 +26,21 @@ class Question:
                     + '\nAnswer: ' + self.answer
         return print_str
 
+def check_line(nl,qnum):
+    #if (not split_nl[0].isnumeric()) and (not split_nl[0] in ['A','B','C','D']):
 
+    if nl[0].isnumeric():
+        if int(nl[0]) != qnum:
+            return True
+        else:
+            return False
+    else:
+        if nl[0] in ['A','B','C','D']:
+            return False
+        else:
+            return True 
+    
+    #return True  
 # mf_name = sys.argv[1]
 # ex_id = sys.argv[2]
 
@@ -37,8 +51,9 @@ class Question:
 # with open(mf_name) as mf:
 fArray = []
 qArray = []
+tmp_qnum = 1;
 prev = ''
-with open('q.txt') as mfr:
+with open('r.txt') as mfr:
     # init_qtxt = mf.readlines()
     line = mfr.readline()
     while line != '':        
@@ -57,25 +72,26 @@ with open('q.txt') as mfr:
 
         line = n_l
 
-with open('qf.txt', 'w') as mfw:
+with open('rf.txt', 'w') as mfw:
     mfw.writelines(fArray)
 
 # ***
 # *** Open cleaned file, create question objects, store into array
 # ***
 
-with open('qf.txt', 'r') as mfr:
+with open('rf.txt', 'r') as mfr:
     qnum = 0
     q = mfr.readline()
     while q != '':
         qnum+=1
+        print(q)
         q = q.split('.',1)[1].replace('\n', '').replace('r','')
         a = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         b = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         c = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         d = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         # i = ex_id + str(qnum)
-        i = 'q' + str(qnum)
+        i = 'r' + str(qnum)
         q = Question(i,q,a,b,c,d)
         qArray.append(q)
         q = mfr.readline()
@@ -83,16 +99,16 @@ with open('qf.txt', 'r') as mfr:
 # ***
 # *** Parse answer text file, store in questions
 # ***
-with open('a.txt') as mfr:
+with open('ar.txt') as mfr:
     line = mfr.readline()
     ind = 0
     for c in line:
         qArray[ind].set_answer(c)
         ind += 1
 
-for q in qArray:
-    print(q)
-    print()
+# for q in qArray:
+#     print(q)
+#     print()
 
 # ***
 # *** can't use json.dumps because it doesn't recognize chinese characters well (saves as \u####)
@@ -119,5 +135,5 @@ for q in qArray:
                  )
 json_str += ']'
 
-with open('j.txt', 'w') as mfw:
+with open('jr.txt', 'w') as mfw:
     mfw.writelines(json_str)
