@@ -45,11 +45,10 @@ def check_line(nl):
     
     #return True  
 name = sys.argv[1]
-ex_id = sys.argv[2]
 mf_name = name+'.txt'
 mf_fixed = name + '_fix.txt'
 mf_ans = name+'_ans.txt'
-mf_json = name+'_json.txt'
+mf_json = name+'.json'
 
 print(mf_name)
 
@@ -101,7 +100,7 @@ with open(mf_fixed, 'r') as mfr:
         c = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         d = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         # i = ex_id + str(qnum)
-        i = ex_id + str(qnum)
+        i = name + str(qnum)
         q = Question(i,q,a,b,c,d)
         qArray.append(q)
         q = mfr.readline()
