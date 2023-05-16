@@ -1,3 +1,5 @@
+import sys
+
 class Question:
     def __init__(self,i,q,a,b,c,d):
         self._id = i
@@ -26,23 +28,30 @@ class Question:
                     + '\nAnswer: ' + self.answer
         return print_str
 
-def check_line(nl,qnum):
-    #if (not split_nl[0].isnumeric()) and (not split_nl[0] in ['A','B','C','D']):
+def check_line(nl):
+    #while (not split_nl[0].isnumeric()) and (not split_nl[0] in ['A','B','C','D']):
 
-    if nl[0].isnumeric():
-        if int(nl[0]) != qnum:
+    if nl.isnumeric():
+        print(nl)
+        if int(nl) == 0:
             return True
         else:
             return False
     else:
-        if nl[0] in ['A','B','C','D']:
-            return False
+        if nl not in ['A','B','C','D']:
+            return True
         else:
-            return True 
+            return False
     
     #return True  
-# mf_name = sys.argv[1]
-# ex_id = sys.argv[2]
+name = sys.argv[1]
+ex_id = sys.argv[2]
+mf_name = name+'.txt'
+mf_fixed = name + '_fix.txt'
+mf_ans = name+'_ans.txt'
+mf_json = name+'_json.txt'
+
+print(mf_name)
 
 # ***
 # *** Clean up original text file so questions and answers are all one line each ***
@@ -51,16 +60,17 @@ def check_line(nl,qnum):
 # with open(mf_name) as mf:
 fArray = []
 qArray = []
-tmp_qnum = 1;
 prev = ''
-with open('r.txt') as mfr:
+
+with open(mf_name) as mfr:
     # init_qtxt = mf.readlines()
     line = mfr.readline()
     while line != '':        
         n_l = mfr.readline()
         if n_l != '':
             split_nl = n_l.split('.',1)
-            while (not split_nl[0].isnumeric()) and (not split_nl[0] in ['A','B','C','D']):
+            #while (not split_nl[0].isnumeric()) and (not split_nl[0] in ['A','B','C','D']):
+            while check_line(split_nl[0]):
                 tmp_l = n_l
                 line = line + tmp_l.replace('\n', '').replace('\r','')
                 n_l = mfr.readline()
@@ -72,14 +82,14 @@ with open('r.txt') as mfr:
 
         line = n_l
 
-with open('rf.txt', 'w') as mfw:
+with open(mf_fixed, 'w') as mfw:
     mfw.writelines(fArray)
 
 # ***
 # *** Open cleaned file, create question objects, store into array
 # ***
 
-with open('rf.txt', 'r') as mfr:
+with open(mf_fixed, 'r') as mfr:
     qnum = 0
     q = mfr.readline()
     while q != '':
@@ -91,7 +101,7 @@ with open('rf.txt', 'r') as mfr:
         c = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         d = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         # i = ex_id + str(qnum)
-        i = 'r' + str(qnum)
+        i = ex_id + str(qnum)
         q = Question(i,q,a,b,c,d)
         qArray.append(q)
         q = mfr.readline()
@@ -99,7 +109,7 @@ with open('rf.txt', 'r') as mfr:
 # ***
 # *** Parse answer text file, store in questions
 # ***
-with open('ar.txt') as mfr:
+with open(mf_ans) as mfr:
     line = mfr.readline()
     ind = 0
     for c in line:
@@ -135,5 +145,6 @@ for q in qArray:
                  )
 json_str += ']'
 
-with open('jr.txt', 'w') as mfw:
+with open(mf_json, 'w') as mfw:
     mfw.writelines(json_str)
+    print('done')

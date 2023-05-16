@@ -173,8 +173,7 @@ A.埃及斑蚊（Aedes aegypti）
 B.白線斑蚊（Aedes albopictus）
 C.熱帶家蚊（Culex quinquefasciatus / C. fatigans）
 D.微小瘧蚊（Anopheles minimus）
-36.假設某研究利用100人之樣本評估12歲兒童的智力測驗分數（IQ，範圍80～140分）與產前暴露到多氯聯苯（Polychlorinated biphenyls, PCBs，範圍500～1800 ng/g of Fat）之關係，建構其迴歸模式如下： =125.7-
-0.02×PCBs，迴歸模式之判定係數（R2）為0.4。下列敘述何者最正確？
+36.假設某研究利用100人之樣本評估12歲兒童的智力測驗分數（IQ，範圍80～140分）與產前暴露到多氯聯苯（Polychlorinated biphenyls, PCBs，範圍500～1800 ng/g of Fat）之關係，建構其迴歸模式如下： =125.7-0.02×PCBs，迴歸模式之判定係數（R2）為0.4。下列敘述何者最正確？
 A.IQ與PCBs的Pearson相關係數為 -0.02，呈負相關
 B.此模式之依變項（dependent variable）為PCBs，自變項（independent variable）為IQ
 C.若PCBs增加了500個單位，則IQ估計值下降1分

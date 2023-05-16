@@ -789,7 +789,8 @@
 "optionD": "經特定鉀離子通道排出（specific K+ channels）",
 "answer": "D",
 "userAnswer": "",
-"explanation": "",
+"explanation": "原答案為(D) 經特定鉀離子通道排出(specific K+ channels)
+經申覆後(B)(D)皆對",
 },
 {
 "_id": "q67",
