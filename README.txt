@@ -3,7 +3,8 @@ How to use:
         > example: ex1.txt, ex1_ans.txt
     - run "sh kp.sh ex*"
         > example: "sh kp.sh ex1"
-    - output: ex1_fix.txt, ex1.json
+    - output: ex*_fix.txt, ex*.json
+        > example: ex1_fix.txt, ex1.json
     - enter ex1.json to database
 
 
