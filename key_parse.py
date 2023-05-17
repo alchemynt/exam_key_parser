@@ -1,4 +1,4 @@
-import sys
+import sys, json, os
 
 class Question:
     def __init__(self,i,q,a,b,c,d):
@@ -14,7 +14,10 @@ class Question:
         self.explanation = ''
     
     def set_answer(self, a):
-        self.answer = a
+        if(a=='#'):
+            self.answer = ''
+        else:
+            self.answer = a
 
     def set_explanation(self, e):
         self.explanation = e
@@ -28,11 +31,46 @@ class Question:
                     + '\nAnswer: ' + self.answer
         return print_str
 
-def check_line(nl):
-    #while (not split_nl[0].isnumeric()) and (not split_nl[0] in ['A','B','C','D']):
+class Answer:
+    def __init__(self,a):
+        self.ans = a
 
+def parse_ans(af):
+    a = ''
+    new_str = ''
+    
+    # with open("extst.txt") as f:
+    with open(af) as f:
+        a = Answer(f.readline())
+    json_string = json.dumps(a.__dict__)
+
+    with open("ans_tmp.txt", 'w') as mfw:
+        mfw.writelines(json_string)
+
+    with open('ans_tmp.txt') as mfr:
+        new_str = mfr.readline().replace('\\uff21','A').replace('\\uff22','B').replace('\\uff23','C').replace('\\uff24','D')\
+                .replace('\\uff03','#').replace('\"}','').replace('{\"ans\": \"','').replace(' ','')
+            
+    return new_str
+
+def file_cleanup():
+    os.remove('ans_tmp.txt')
+    if os.path.exists('bak'):
+        os.replace(mf_name, 'bak/'+mf_name)
+        os.replace(mf_fixed, 'bak/'+mf_fixed)
+        os.replace(mf_ans, 'bak/'+mf_ans)
+        os.replace(mf_json, 'bak/'+mf_json)
+    else:
+        os.makedirs('bak')
+        os.replace(mf_name, 'bak/'+mf_name)
+        os.replace(mf_fixed, 'bak/'+mf_fixed)
+        os.replace(mf_ans, 'bak/'+mf_ans)
+        os.replace(mf_json, 'bak/'+mf_json)
+
+
+def check_line(nl):
     if nl.isnumeric():
-        print(nl)
+        # print(nl)
         if int(nl) == 0:
             return True
         else:
@@ -43,14 +81,14 @@ def check_line(nl):
         else:
             return False
     
-    #return True  
 name = sys.argv[1]
 mf_name = name+'.txt'
 mf_fixed = name + '_fix.txt'
 mf_ans = name+'_ans.txt'
 mf_json = name+'.json'
+name = name.replace('ex','')
 
-print(mf_name)
+# print(mf_name)
 
 # ***
 # *** Clean up original text file so questions and answers are all one line each ***
@@ -93,7 +131,7 @@ with open(mf_fixed, 'r') as mfr:
     q = mfr.readline()
     while q != '':
         qnum+=1
-        print(q)
+        # print(q)
         q = q.split('.',1)[1].replace('\n', '').replace('r','')
         a = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         b = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
@@ -108,12 +146,13 @@ with open(mf_fixed, 'r') as mfr:
 # ***
 # *** Parse answer text file, store in questions
 # ***
-with open(mf_ans) as mfr:
-    line = mfr.readline()
-    ind = 0
-    for c in line:
-        qArray[ind].set_answer(c)
-        ind += 1
+ans_list=parse_ans(mf_ans)
+print(ans_list)
+ind = 0
+for c in ans_list:
+    qArray[ind].set_answer(c)
+    print(ind)
+    ind += 1
 
 # for q in qArray:
 #     print(q)
@@ -147,3 +186,5 @@ json_str += ']'
 with open(mf_json, 'w') as mfw:
     mfw.writelines(json_str)
     print('done')
+
+file_cleanup()

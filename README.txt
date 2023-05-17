@@ -25,3 +25,7 @@ How to use:
     -- update to use sys.argv 
     -- set up shell script
         ** need to set up Qs and As separately, _fixed and _json built
+
+05/17
+    -- update answer parsing 
+    -- update file cleanup -> move things to bak folder
