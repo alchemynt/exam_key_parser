@@ -14,10 +14,7 @@ class Question:
         self.explanation = ''
     
     def set_answer(self, a):
-        if(a=='#'):
-            self.answer = ''
-        else:
-            self.answer = a
+        self.answer = a
 
     def set_explanation(self, e):
         self.explanation = e
