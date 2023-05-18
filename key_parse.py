@@ -1,4 +1,5 @@
 import sys, json, os
+import PyPDF2, re
 
 class Question:
     def __init__(self,i,q,a,b,c,d):
@@ -56,12 +57,15 @@ def file_cleanup():
         os.replace(mf_name, 'bak/'+mf_name)
         os.replace(mf_fixed, 'bak/'+mf_fixed)
         os.replace(mf_ans, 'bak/'+mf_ans)
-        os.replace(mf_json, 'bak/'+mf_json)
     else:
         os.makedirs('bak')
         os.replace(mf_name, 'bak/'+mf_name)
         os.replace(mf_fixed, 'bak/'+mf_fixed)
         os.replace(mf_ans, 'bak/'+mf_ans)
+
+    if os.path.exists('json'):
+        os.replace(mf_json, 'json/'+mf_json)
+    else:
         os.replace(mf_json, 'bak/'+mf_json)
 
 
@@ -83,7 +87,13 @@ mf_name = name+'.txt'
 mf_fixed = name + '_fix.txt'
 mf_ans = name+'_ans.txt'
 mf_json = name+'.json'
+mf_pdf = name+'.pdf'
 name = name.replace('ex','')
+
+if os.path.exists(mf_fixed):
+        os.mknod(mf_fixed)
+if os.path.exists(mf_json):
+        os.mknod(mf_json)
 
 # print(mf_name)
 
@@ -144,12 +154,38 @@ with open(mf_fixed, 'r') as mfr:
 # *** Parse answer text file, store in questions
 # ***
 ans_list=parse_ans(mf_ans)
-print(ans_list)
+#print(ans_list)
 ind = 0
 for c in ans_list:
     qArray[ind].set_answer(c)
-    print(ind)
+    #print(ind)
     ind += 1
+
+# ***
+# *** Parse explanations from pdf file, store in questions
+# ***
+reader = PyPDF2.PdfReader(mf_pdf)
+pdf_all = ''
+
+explanations = []
+for p in reader.pages:
+    pdf_all += p.extract_text() + ' '
+
+pdf_ol = pdf_all.replace('\r',' ').replace('\n', ' ').replace('  ',' ')
+
+simple = re.split('簡解 | 詳解', pdf_ol)
+count = 1
+qNum = 0
+for s in simple:
+    if count%2==0:
+        explanations.append({qNum:s})
+    else:
+        qNumS = re.search("醫學一第\d+", s.replace(' ',''))
+        if qNumS:
+            qNum = qNumS.group(0).replace('醫學一第','')
+    count += 1
+
+print(explanations)
 
 # for q in qArray:
 #     print(q)

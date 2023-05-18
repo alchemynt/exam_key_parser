@@ -29,3 +29,10 @@ How to use:
 05/17
     -- update answer parsing 
     -- update file cleanup -> move things to bak folder
+
+05/18
+    -- add explanation parsing 
+        > opens PDF, reads text, splits based on (簡解 | 詳解) -> simple explain, detailed explain -> gives us simple explanations
+        > also use regex to find the question number for each explanation (in case any question numbers are skipped)
+        > saves into array of dictionaries
+        ** TODO : use AoD to update explanations for question array 
