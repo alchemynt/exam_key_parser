@@ -40,3 +40,5 @@ How to use:
 05/20
     -- update explanation parsing 
     ** works in general, need to test each input for special cases because not all of them are created equally / flawlessly
+    -- add cat_json.py to concatentate all jsons in the json directory
+    -- store PDFs in pdf directory 
