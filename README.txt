@@ -35,4 +35,8 @@ How to use:
         > opens PDF, reads text, splits based on (簡解 | 詳解) -> simple explain, detailed explain -> gives us simple explanations
         > also use regex to find the question number for each explanation (in case any question numbers are skipped)
         > saves into array of dictionaries
-        ** TODO : use AoD to update explanations for question array 
+        ** DONE : use AoD to update explanations for question array 
+
+05/20
+    -- update explanation parsing 
+    ** works in general, need to test each input for special cases because not all of them are created equally / flawlessly

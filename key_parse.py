@@ -42,17 +42,18 @@ def parse_ans(af):
         a = Answer(f.readline())
     json_string = json.dumps(a.__dict__)
 
-    with open("ans_tmp.txt", 'w') as mfw:
+    with open("tmpANS.txt", 'w') as mfw:
         mfw.writelines(json_string)
 
-    with open('ans_tmp.txt') as mfr:
+    with open('tmpANS.txt') as mfr:
         new_str = mfr.readline().replace('\\uff21','A').replace('\\uff22','B').replace('\\uff23','C').replace('\\uff24','D')\
                 .replace('\\uff03','#').replace('\"}','').replace('{\"ans\": \"','').replace(' ','')
             
     return new_str
 
 def file_cleanup():
-    os.remove('ans_tmp.txt')
+    os.remove('tmpANS.txt')
+    os.remove('tmpPDF.txt')
     if os.path.exists('bak'):
         os.replace(mf_name, 'bak/'+mf_name)
         os.replace(mf_fixed, 'bak/'+mf_fixed)
@@ -83,6 +84,7 @@ def check_line(nl):
             return False
     
 name = sys.argv[1]
+print('Parsing: ' + name)
 mf_name = name+'.txt'
 mf_fixed = name + '_fix.txt'
 mf_ans = name+'_ans.txt'
@@ -90,30 +92,27 @@ mf_json = name+'.json'
 mf_pdf = name+'.pdf'
 name = name.replace('ex','')
 
-if os.path.exists(mf_fixed):
+if not os.path.exists(mf_fixed):
         os.mknod(mf_fixed)
-if os.path.exists(mf_json):
+if not os.path.exists(mf_json):
         os.mknod(mf_json)
-
-# print(mf_name)
+if not os.path.exists('tmpPDF.txt'):
+        os.mknod('tmpPDF.txt')
 
 # ***
 # *** Clean up original text file so questions and answers are all one line each ***
 # ***
 
-# with open(mf_name) as mf:
 fArray = []
 qArray = []
 prev = ''
 
 with open(mf_name) as mfr:
-    # init_qtxt = mf.readlines()
     line = mfr.readline()
     while line != '':        
         n_l = mfr.readline()
         if n_l != '':
             split_nl = n_l.split('.',1)
-            #while (not split_nl[0].isnumeric()) and (not split_nl[0] in ['A','B','C','D']):
             while check_line(split_nl[0]):
                 tmp_l = n_l
                 line = line + tmp_l.replace('\n', '').replace('\r','')
@@ -144,7 +143,6 @@ with open(mf_fixed, 'r') as mfr:
         b = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         c = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
         d = mfr.readline().split('.',1)[1].replace('\n', '').replace('\r','')
-        # i = ex_id + str(qnum)
         i = name + str(qnum)
         q = Question(i,q,a,b,c,d)
         qArray.append(q)
@@ -164,28 +162,95 @@ for c in ans_list:
 # ***
 # *** Parse explanations from pdf file, store in questions
 # ***
-reader = PyPDF2.PdfReader(mf_pdf)
+reader = PyPDF2.PdfReader("pdf/" + mf_pdf)
 pdf_all = ''
 
-explanations = []
+explanations = {}
 for p in reader.pages:
     pdf_all += p.extract_text() + ' '
 
 pdf_ol = pdf_all.replace('\r',' ').replace('\n', ' ').replace('  ',' ')
 
-simple = re.split('簡解 | 詳解', pdf_ol)
+#simple = re.split('( 簡解 )|( 詳解 )', pdf_ol)
+# pdf_lines = pdf_ol.replace('-簡解','簡解').replace(' 簡解 ','\n').replace(' 詳解 ','\n')
+count = 1
+simple = []
+pdfl = []
+skip = False
+
+s1 = pdf_ol.replace('-簡解','簡解').split(' 簡解 ')
+for s in s1:
+    s2 = s.split(' 詳解 ',1)
+    pdfl.append(s2[0])
+    if len(s2) > 1:
+        pdfl.append(s2[1])
+
+with open('tmpPDF.txt','w') as mfw:
+    for l in pdfl:
+        mfw.write(l+'\n')
+    # mfw.writelines(pdfl)
+    # mfw.write(pdf_ol.replace('-簡解','簡解').replace(' 簡解 ','\n').replace(' 詳解 ','\n'))
+
+with open('tmpPDF.txt') as mfr:
+    pdf_lines = mfr.readlines()
+
+for line in pdf_lines:
+    # print(str(count) + ': ' + line)
+    if count%2 == 0 and '醫學二 第' in line:
+        line = line.replace('醫學二 第','\n醫學二 第')
+        for l in line.splitlines():
+            simple.append(l)
+            #print(str(count) + ': ' + l)
+        skip = True
+        count += 1
+    else:
+        simple.append(line)
+    count += 1
+#simple = pdf_ol2.split('\n')
 count = 1
 qNum = 0
-for s in simple:
-    if count%2==0:
-        explanations.append({qNum:s})
-    else:
-        qNumS = re.search("醫學一第\d+", s.replace(' ',''))
-        if qNumS:
-            qNum = qNumS.group(0).replace('醫學一第','')
-    count += 1
 
-print(explanations)
+#build dictionary array with question number and simple explanation
+
+#1111a and 1111b use different pdf format than 1112+
+if('1111' in name):
+    for s in simple:
+        #print(str(count)+': '+s)
+        if count%2==0:
+            explanations[qNum]=s
+        else:
+            qNumS = re.search("醫學一第\d+", s.replace(' ',''))
+            if qNumS:
+                qNum = qNumS.group(0).replace('醫學一第','')
+            else:
+                qNumS = re.search("醫學二第\d+", s.replace(' ',''))
+                if qNumS:
+                    qNum = qNumS.group(0).replace('醫學二第','')
+        count += 1
+else:
+    for s in simple:
+        ####print(str(count)+': '+s)
+        if count%2==0:
+            explanations[qNum]=s
+        else:
+            qNumS = re.search("題號\d+", s.replace(' ',''))
+            if qNumS:
+                qNum = qNumS.group(0).replace('題號','')
+            #else:
+                #print('error')
+                # qNumS = re.search("醫學\d+", s.replace(' ',''))
+                # if qNumS:
+                #     qNum = qNumS.group(0).replace('醫學','')
+        count += 1
+
+for q in qArray:
+    qNum = q._id.replace(name,'')
+    if qNum in explanations:
+        q.set_explanation(explanations[qNum].replace('\n',''))
+        #print(qNum + ': ' + q.explanation+ '\n')
+    else: print('explanation missing: ' + qNum + '\n')
+
+#print(explanations)
 
 # for q in qArray:
 #     print(q)
@@ -214,10 +279,11 @@ for q in qArray:
                  '"explanation": "' + q.explanation + '",\n'\
                  '},\n'
                  )
+    #print(q.explanation)
 json_str += ']'
 
 with open(mf_json, 'w') as mfw:
     mfw.writelines(json_str)
-    print('done')
+    print('done\n')
 
 file_cleanup()
